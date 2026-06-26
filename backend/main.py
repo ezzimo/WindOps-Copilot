@@ -1,3 +1,4 @@
+import os
 import uuid
 import time
 from datetime import datetime, timedelta, timezone
@@ -15,9 +16,13 @@ from backend.services import gmail_service
 
 app = FastAPI(title="WindOps Copilot Backend API")
 
+# Allow CORS origins from environment variable; fallback to local frontend.
+_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000")
+allow_origins = [origin.strip() for origin in _cors_origins.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
