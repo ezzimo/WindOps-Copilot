@@ -1,0 +1,27 @@
+name: WindOps Copilot Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: []   # pas de dépendance : le CI tourne séparément
+
+    steps:
+      - name: Deploy backend to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+
+      - name: Deploy frontend to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
+
+      - name: Wait and verify backend health
+        run: |
+          echo "Waiting 30s for deployment..."
+          sleep 30
+          curl --fail ${{ secrets.BACKEND_PROD_URL }}/health \
+            || echo "Health check failed - check Render logs"
